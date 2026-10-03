@@ -20,6 +20,7 @@ Use `DISCORD_GUILD_ID` during development: guild commands appear almost immediat
 - `/teamup` — posts a team-up template (with role, skills, and timezone)
 - `/submit` — opens the jam submission page
 - `/announce` — admin-only event update in the configured announcements channel
+- `/verify` — private, optional email-verification link for the member running it
 
 The bot needs no privileged gateway intents.
 
@@ -49,7 +50,7 @@ Set `FIREBASE_PROJECT_ID` and `FIREBASE_SERVICE_ACCOUNT_JSON` in the bot host en
 
 ## Optional email verification
 
-Members can use the server without verifying. The bot does not automatically DM new members or lock channels. An organiser can explicitly send optional verification invitations from the dashboard; recipients enter an email address and confirm a six-digit code. The bot then gives them `VERIFIED_ROLE_ID` and logs their Discord ID, username, email, and time to `VerifiedMembers.gs`. Configure the environment values in `.env.example` on their appropriate host: Gmail SMTP settings belong to Vercel; the Sheets webhook belongs to the bot host. Keep every real-email Sheet restricted. Previously locked Discord channels must be reopened in Discord permissions.
+Members can use the server without verifying. The bot does not automatically DM new members or lock channels. A member can run `/verify` for a private link, or an organiser can explicitly send optional verification invitations from the dashboard. Recipients enter an email address and confirm a six-digit code. The bot then gives them `VERIFIED_ROLE_ID` and logs their Discord ID, username, email, and time to `VerifiedMembers.gs`. Configure the environment values in `.env.example` on their appropriate host: Gmail SMTP settings belong to Vercel; the Sheets webhook belongs to the bot host. Keep every real-email Sheet restricted. Previously locked Discord channels must be reopened in Discord permissions.
 
 For Wispbyte deployment, use the ready-made archive and instructions in [WISPBYTE.md](WISPBYTE.md).
 

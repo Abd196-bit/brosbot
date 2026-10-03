@@ -1,6 +1,8 @@
-import { PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
+import { InteractionContextType, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { startPoll } from './poll-ui.js';
 import { submitTheme } from './theme-vote.js';
+import { createVerificationToken } from '../lib/verification-token.js';
+import { memberVerificationConfigured } from './member-verification.js';
 
 export const commandData = [
   new SlashCommandBuilder().setName('vote').setDescription('Suggest a jam theme in the voting channel.').setDMPermission(false)
@@ -14,6 +16,7 @@ export const commandData = [
     .addStringOption((option) => option.setName('skills').setDescription('Your skills or the skills needed.').setRequired(true))
     .addStringOption((option) => option.setName('timezone').setDescription('Your timezone or availability.').setRequired(true)),
   new SlashCommandBuilder().setName('submit').setDescription('Open the jam submission page.'),
+  new SlashCommandBuilder().setName('verify').setDescription('Get your private email-verification link.').setContexts(InteractionContextType.Guild),
   new SlashCommandBuilder()
     .setName('poll').setDescription('Create a rich interactive poll.')
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
@@ -62,6 +65,14 @@ export async function handleCommand(interaction, config) {
     }
     case 'submit':
       return interaction.reply(`Ready to share your game? Submit it here: ${jam.url}`);
+    case 'verify': {
+      if (!interaction.guildId || !interaction.guild) return interaction.reply({ content: 'Use `/verify` in the BRO’S JAM server.', flags: MessageFlags.Ephemeral });
+      if (!memberVerificationConfigured(config)) return interaction.reply({ content: 'Email verification is not configured yet. Please contact an organiser.', flags: MessageFlags.Ephemeral });
+      if (!interaction.guild.roles.cache.has(config.verifiedRoleId)) return interaction.reply({ content: 'The Verified role is not set up in this server. Please contact an organiser.', flags: MessageFlags.Ephemeral });
+      const token = createVerificationToken({ guildId: interaction.guildId, userId: interaction.user.id, username: interaction.user.username });
+      const link = `${config.dashboardUrl.replace(/\/$/, '')}/verify?token=${encodeURIComponent(token)}`;
+      return interaction.reply({ content: `Verify your email here (only you can see this link):\n${link}\nThis link expires in 7 days. Verification is optional.`, flags: MessageFlags.Ephemeral, allowedMentions: { parse: [] } });
+    }
     case 'poll': return startPoll(interaction);
     case 'announce': {
       if (!config.announcementChannelId) return interaction.reply({ content: 'Set `ANNOUNCEMENT_CHANNEL_ID` in `.env` before using this command.', ephemeral: true });
