@@ -13,6 +13,7 @@ export function getConfig() {
     announcementChannelId: process.env.ANNOUNCEMENT_CHANNEL_ID || null,
     voteChannelId: process.env.VOTE_CHANNEL_ID || null,
     verifiedRoleId: process.env.VERIFIED_ROLE_ID || null,
+    verifyChannelId: process.env.VERIFY_CHANNEL_ID || null,
     dashboardUrl: process.env.DASHBOARD_URL || null,
     botApiSecret: process.env.BOT_API_SECRET || null,
     rules: process.env.JAM_RULES || 'Keep the scope tiny, be kind to fellow jammers, credit any third-party assets, disclose AI-generated assets in your submission notes, and submit before the deadline.',

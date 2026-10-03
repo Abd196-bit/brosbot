@@ -25,11 +25,12 @@ Use the **same Firebase values** in Vercel. The dashboard queues actions in Fire
 | --- | --- |
 | `DASHBOARD_URL` | Full production Vercel URL, like `https://bros-jam.vercel.app` |
 | `VERIFIED_ROLE_ID` | Discord Verified role ID |
+| `VERIFY_CHANNEL_ID` | Optional channel ID for `#verify` |
 | `VERIFICATION_LINK_SECRET` | Long random string; identical on Wispbyte and Vercel |
 | `VERIFICATION_SHEETS_WEBHOOK_URL` | `/exec` URL from `VerifiedMembers.gs` deployment |
 | `VERIFICATION_SHEETS_WEBHOOK_SECRET` | Same `WEBHOOK_SECRET` set in that Apps Script's properties |
 
-Enable **Server Members Intent** in Discord Developer Portal → Bot. Put the bot's role above the Verified role and give it **Manage Roles**. Set channel permissions so `@everyone` sees only `#verify` and Verified members see the rest.
+Verification is optional. The bot does not DM new members automatically or change channel access. The dashboard can send optional verification invitations when you explicitly request a campaign. Enable **Server Members Intent** in Discord Developer Portal → Bot for campaigns. Put the bot's role above the Verified role and give it **Manage Roles** to grant the role after verification. If you previously locked channels, restore `@everyone` → **View Channel** in Discord; existing permission overrides do not disappear when bot code changes.
 
 ## Optional bot values
 
@@ -49,5 +50,7 @@ Enable **Server Members Intent** in Discord Developer Portal → Bot. Put the bo
 ## Vercel-only values
 
 Do not put these on Wispbyte: `DASHBOARD_PASSWORD`, `EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, and `SMTP_APP_PASSWORD`. Vercel also needs `FIREBASE_PROJECT_ID`, `FIREBASE_SERVICE_ACCOUNT_JSON`, `FIREBASE_COLLECTION`, `DASHBOARD_URL`, and the matching `VERIFICATION_LINK_SECRET`.
+
+The dashboard can send plain-text email to one verified member or all verified members using these SMTP settings. It selects members with completed verification records in Firestore. Group mail uses BCC and is limited to 50 recipients per send.
 
 Keep `.env`, the Gmail App Password, and the Firebase service-account JSON out of GitHub.

@@ -47,9 +47,9 @@ The bot reads the public `syncmadinadu` Sheet1 calendar at startup. It uses its 
 
 Set `FIREBASE_PROJECT_ID` and `FIREBASE_SERVICE_ACCOUNT_JSON` in the bot host environment to mirror every published-poll event, theme suggestion, vote change, custom written idea, and closure into Firestore path `october/jam-data/votes`. The document ID is the event UUID, so retries cannot duplicate data. See `WISPBYTE.md` for the Firebase Console steps. The local SQLite database remains the source of truth when Firebase is unavailable.
 
-## Email verification gate
+## Optional email verification
 
-New non-admin members receive a private link to `/verify`, enter an email address, and confirm a six-digit email code. The bot then gives them `VERIFIED_ROLE_ID` and logs their Discord ID, username, email, and time to `VerifiedMembers.gs`. The dashboard button can also send a paced one-time campaign to existing non-admin, non-Verified members. Configure the environment values in `.env.example` on their appropriate host: Gmail SMTP settings belong to Vercel; the Sheets webhook belongs to the bot host. Keep every real-email Sheet restricted.
+Members can use the server without verifying. The bot does not automatically DM new members or lock channels. An organiser can explicitly send optional verification invitations from the dashboard; recipients enter an email address and confirm a six-digit code. The bot then gives them `VERIFIED_ROLE_ID` and logs their Discord ID, username, email, and time to `VerifiedMembers.gs`. Configure the environment values in `.env.example` on their appropriate host: Gmail SMTP settings belong to Vercel; the Sheets webhook belongs to the bot host. Keep every real-email Sheet restricted. Previously locked Discord channels must be reopened in Discord permissions.
 
 For Wispbyte deployment, use the ready-made archive and instructions in [WISPBYTE.md](WISPBYTE.md).
 

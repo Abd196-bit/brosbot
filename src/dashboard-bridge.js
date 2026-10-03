@@ -15,7 +15,14 @@ export async function publishDashboardState(client, config, repository) {
     channelId: poll.channelId, messageId: poll.messageId, closed: Boolean(poll.closed),
     suggestedBy: poll.suggestedBy || null,
   })));
-  await store.collection('dashboardState').doc('current').set({ online: true, lastSeen: new Date().toISOString(), botName: client.user.tag, guildCount: client.guilds.cache.size, jam: config.jam, activity: client.user.presence.activities[0]?.name || '', announcementChannelId: config.announcementChannelId, voteChannelId: config.voteChannelId, verifiedRoleId: config.verifiedRoleId, rules: config.rules, resources: config.resources });
+  const guilds = [];
+  for (const guild of client.guilds.cache.values()) {
+    const channels = [...guild.channels.cache.values()];
+    let publicChannels = 0;
+    for (const channel of channels) if (!channel.isThread() && channel.permissionsFor(guild.roles.everyone)?.has('ViewChannel')) publicChannels += 1;
+    guilds.push({ id: guild.id, name: guild.name, channels: channels.length, publicChannels });
+  }
+  await store.collection('dashboardState').doc('current').set({ online: true, lastSeen: new Date().toISOString(), botName: client.user.tag, guildCount: client.guilds.cache.size, guilds, jam: config.jam, activity: client.user.presence.activities[0]?.name || '', announcementChannelId: config.announcementChannelId, voteChannelId: config.voteChannelId, verifiedRoleId: config.verifiedRoleId, verifyChannelId: config.verifyChannelId, rules: config.rules, resources: config.resources });
 }
 
 export async function loadDashboardSettings(client, config) {
@@ -24,7 +31,7 @@ export async function loadDashboardSettings(client, config) {
     const settings = (await root().collection('dashboardConfig').doc('current').get()).data();
     if (!settings) return;
     Object.assign(config.jam, settings.jam || {});
-    for (const key of ['announcementChannelId', 'voteChannelId', 'verifiedRoleId', 'rules', 'resources']) if (settings[key] !== undefined) config[key] = settings[key];
+    for (const key of ['announcementChannelId', 'voteChannelId', 'verifiedRoleId', 'verifyChannelId', 'rules', 'resources']) if (settings[key] !== undefined) config[key] = settings[key];
     if (settings.activity) client.user.setActivity(settings.activity, { type: ActivityType.Playing });
   } catch (error) { console.error('Could not load dashboard settings:', error.message); }
 }

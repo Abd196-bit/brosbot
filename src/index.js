@@ -7,7 +7,7 @@ import { handleThemeVote, themeMessage } from './theme-vote.js';
 import { flushSheetEvents, sheetsConfigured } from './google-sheet-sync.js';
 import { firebaseConfigured, flushFirebaseEvents } from './firebase-sync.js';
 import { loadJamSchedule } from './jam-schedule-sheet.js';
-import { grantVerifiedMembers, memberVerificationConfigured, runVerificationCampaign, sendVerificationDm } from './member-verification.js';
+import { grantVerifiedMembers, memberVerificationConfigured, runVerificationCampaign } from './member-verification.js';
 import { loadDashboardSettings, runDashboardBridge } from './dashboard-bridge.js';
 
 let config = getConfig();
@@ -45,11 +45,6 @@ client.once(Events.ClientReady, async (readyClient) => {
       console.log('Updated poll message',poll.messageId);
     } catch(error) { console.error('Could not refresh poll message',poll.messageId,error.code || error.name); }
   }
-});
-
-client.on(Events.GuildMemberAdd, async (member) => {
-  try { if (await sendVerificationDm(member, config)) console.log(`Sent verification DM to ${member.user.id}.`); }
-  catch (error) { console.error(`Could not send verification DM to ${member.user.id}:`, error.code || error.message); }
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
