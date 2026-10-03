@@ -1,0 +1,10 @@
+.git
+.env
+.next
+node_modules
+data
+test
+app
+lib
+*.log
+*.zip

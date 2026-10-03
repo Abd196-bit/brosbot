@@ -1,0 +1,31 @@
+{
+  "name": "bros-jam-discord-bot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reusable Discord bot for BRO'S JAM community events.",
+  "type": "module",
+  "scripts": {
+    "bot:start": "node index.js",
+    "deploy-commands": "node src/deploy-commands.js",
+    "bot:dev": "node --watch src/index.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=24 <26"
+  },
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^16.6.1",
+    "firebase-admin": "^14.5.0",
+    "nodemailer": "^10.0.14"
+  },
+  "devDependencies": {
+    "@vercel/kv": "^3.0.0",
+    "next": "^16.0.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}
