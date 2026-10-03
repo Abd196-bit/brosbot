@@ -19,17 +19,17 @@ The script adds a `Theme vote events` tab and preserves other tabs. It logs subm
 
 New events appear at `october` (collection) → `jam-data` (document) → `votes` (collection). Theme documents have readable fields `theme`, `suggestedBy`, `suggestedAt`, `ayeCount`, `nayCount`, `noOpinionCount`, and `totalVotes`. They deliberately do not store the individual selected answer or custom written answer. Each document is an immutable audit event keyed by its UUID: `poll.published`, `poll.closed`, `vote.saved`, `theme.submitted`, or `theme.voted`. A person changing their vote creates a later event; use the latest event for the current state. Anyone can submit unlimited `/vote theme:...` suggestions.
 
-## Email verification gate
+## Optional email verification
 
 Set `VERIFIED_ROLE_ID` to your Discord Verified role ID and put the bot role above it. Enable **Server Members Intent** in Discord Developer Portal → Bot → Privileged Gateway Intents. In Vercel and Wispbyte, set the same `FIREBASE_PROJECT_ID`, `FIREBASE_SERVICE_ACCOUNT_JSON`, `DASHBOARD_URL`, and `VERIFICATION_LINK_SECRET`. Set Gmail SMTP values only in Vercel: `EMAIL_FROM`, `SMTP_USER`, and `SMTP_APP_PASSWORD` (a Google App Password, never your normal Gmail password). Set `VERIFICATION_SHEETS_WEBHOOK_URL` and `VERIFICATION_SHEETS_WEBHOOK_SECRET` in Wispbyte to the deployment from `VerifiedMembers.gs`.
 
-New non-admin members receive a private email-verification link. The Vercel page sends a six-digit code, then the bot adds the Verified role and writes the Discord user ID, username, email, and verification time to the private Sheet. In the organiser dashboard, **Send verification DMs** queues a one-time campaign for existing eligible members. It skips admins, bots, and Verified members; DMs are paced and failures are recorded in Firebase.
+Members can use the server without verifying. The bot no longer sends verification DMs on join or locks channels. The Vercel page can still send a six-digit code to members who choose to verify, and the dashboard can send optional invitations when an organiser clicks **Send optional verification invites**. If channels were previously locked, restore `@everyone` → **View Channel** in Discord; deploying new bot code does not reverse permission overrides.
 
 This upload targets Node.js 25 and uses Wispbyte's Node.js image.
 
 1. Sign in at [Wispbyte](https://wispbyte.com/client) and create one free server.
 2. Choose the **Node.js** image. If a Node version selector is shown, select **25**.
-3. Open **Files**, upload `bros-jam-wispbyte-node25.zip`, and extract it into the server's root. `index.js` and `package.json` must be visible at the top level, not inside another folder.
+3. Open **Files** and upload the current source files from GitHub, or pull the latest `main` if your Wispbyte server is a Git checkout. Do not use an older ZIP; it predates optional verification. `index.js` and `package.json` must be visible at the top level, not inside another folder.
 4. Open **Startup** and set the startup command to `node index.js`.
 5. Leave **Additional Node Packages** blank. `package.json` installs `discord.js` and `dotenv` automatically.
 6. Add the environment variables listed in `.env.example` through Wispbyte's environment-variable controls. Do not upload your real `.env` file.
