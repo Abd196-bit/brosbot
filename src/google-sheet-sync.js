@@ -1,7 +1,23 @@
 let syncing = false;
 
+function webhookConfigured(url, secret) {
+  if (!url || !secret) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && (!parsed.hostname.endsWith('script.google.com') || parsed.pathname.endsWith('/exec'));
+  } catch { return false; }
+}
+
+export function pollSheetsConfigured() {
+  return webhookConfigured(process.env.GOOGLE_SHEETS_WEBHOOK_URL, process.env.GOOGLE_SHEETS_WEBHOOK_SECRET);
+}
+
+export function themeSheetsConfigured() {
+  return webhookConfigured(process.env.THEME_SHEETS_WEBHOOK_URL, process.env.THEME_SHEETS_WEBHOOK_SECRET);
+}
+
 export function sheetsConfigured() {
-  return Boolean((process.env.GOOGLE_SHEETS_WEBHOOK_URL && process.env.GOOGLE_SHEETS_WEBHOOK_SECRET) || (process.env.THEME_SHEETS_WEBHOOK_URL && process.env.THEME_SHEETS_WEBHOOK_SECRET));
+  return pollSheetsConfigured() || themeSheetsConfigured();
 }
 
 export async function flushSheetEvents(repository) {
@@ -9,8 +25,8 @@ export async function flushSheetEvents(repository) {
   syncing = true;
   try {
     const events=[
-      ...(process.env.GOOGLE_SHEETS_WEBHOOK_URL && process.env.GOOGLE_SHEETS_WEBHOOK_SECRET ? repository.pendingSheetEvents(25,'poll') : []),
-      ...(process.env.THEME_SHEETS_WEBHOOK_URL && process.env.THEME_SHEETS_WEBHOOK_SECRET ? repository.pendingSheetEvents(25,'theme') : []),
+      ...(pollSheetsConfigured() ? repository.pendingSheetEvents(25,'poll') : []),
+      ...(themeSheetsConfigured() ? repository.pendingSheetEvents(25,'theme') : []),
     ];
     for (const event of events) {
       const themeEvent=event.type.startsWith('theme.');
@@ -27,11 +43,13 @@ export async function flushSheetEvents(repository) {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const result = await response.json();
+        let result;
+        try { result = JSON.parse(await response.text()); }
+        catch { throw new Error('Webhook returned a web page instead of JSON. Use the published Apps Script /exec URL with access set to Anyone.'); }
         if (!result.ok) throw new Error(result.error || 'Webhook rejected the event');
         repository.completeSheetEvent(event.id);
       } catch (error) {
-        console.error('Google Sheets sync paused:', error.message);
+        console.error(`${themeEvent ? 'Theme' : 'Poll'} Google Sheets sync paused:`, error.message);
         continue;
       } finally { clearTimeout(timeout); }
     }

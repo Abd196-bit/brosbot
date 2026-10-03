@@ -51,6 +51,7 @@ The target workbook is `1vRXH96L9whUmVb5leykCxpx22IyqlPZp-RgLXUgN4bc`. Open it, 
 2. Open **Project Settings → Script properties** and add `WEBHOOK_SECRET` with a long random value.
 3. Choose **Deploy → New deployment → Web app**. Execute as **Me** and allow access to **Anyone**. Authorize the script, then copy the `/exec` web-app URL.
 4. In Wispbyte, set `GOOGLE_SHEETS_WEBHOOK_URL` to that URL and `GOOGLE_SHEETS_WEBHOOK_SECRET` to the same random value.
-5. Restart the bot. Its console must print `Google Sheets sync enabled.`
+5. Open the `/exec` URL in a browser. It must return JSON with `service: "BRO’S JAM poll sync"`, `sheetAccessible: true`, and `secretConfigured: true`. If you edited the script, deploy a new version before this check.
+6. Restart the bot. Its console must print `Poll Google Sheets sync enabled.` This is separate from `Theme Google Sheets sync enabled.` A placeholder such as `your_apps_script_exec_url` is not a real URL.
 
 The script creates `Polls` and `Votes` tabs automatically. Polls, closures, preset votes, and private ideas are queued locally and retried every 30 seconds. Private ideas appear only in the organiser spreadsheet and never in the public Discord message. Keep the spreadsheet private to trusted organisers.

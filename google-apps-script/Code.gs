@@ -1,5 +1,14 @@
 const SPREADSHEET_ID = '1vRXH96L9whUmVb5leykCxpx22IyqlPZp-RgLXUgN4bc';
 
+function doGet() {
+  try {
+    const book = SpreadsheetApp.openById(SPREADSHEET_ID);
+    return json_({ ok: true, service: 'BRO’S JAM poll sync', sheetAccessible: Boolean(book), secretConfigured: Boolean(PropertiesService.getScriptProperties().getProperty('WEBHOOK_SECRET')) });
+  } catch (error) {
+    return json_({ ok: false, error: String(error.message || error) });
+  }
+}
+
 function doPost(e) {
   const lock = LockService.getScriptLock();
   try {

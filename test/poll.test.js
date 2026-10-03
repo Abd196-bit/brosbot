@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createRepository } from '../src/poll-repository.js';
 import { editorModal, pollMessage, validateDraft, startPoll, handlePollInteraction } from '../src/poll-ui.js';
 import { PermissionFlagsBits } from 'discord.js';
-import { flushSheetEvents } from '../src/google-sheet-sync.js';
+import { flushSheetEvents, pollSheetsConfigured } from '../src/google-sheet-sync.js';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -122,5 +122,22 @@ test('Google Sheet events remain queued until webhook accepts them',async()=>{
     if (previousUrl===undefined) delete process.env.GOOGLE_SHEETS_WEBHOOK_URL; else process.env.GOOGLE_SHEETS_WEBHOOK_URL=previousUrl;
     if (previousSecret===undefined) delete process.env.GOOGLE_SHEETS_WEBHOOK_SECRET; else process.env.GOOGLE_SHEETS_WEBHOOK_SECRET=previousSecret;
     repo.close();
+  }
+});
+
+test('poll Sheet sync rejects placeholder and unpublished Apps Script URLs', () => {
+  const previousUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+  const previousSecret = process.env.GOOGLE_SHEETS_WEBHOOK_SECRET;
+  try {
+    process.env.GOOGLE_SHEETS_WEBHOOK_SECRET = 'test-secret';
+    process.env.GOOGLE_SHEETS_WEBHOOK_URL = 'your_apps_script_exec_url';
+    assert.equal(pollSheetsConfigured(), false);
+    process.env.GOOGLE_SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/test/dev';
+    assert.equal(pollSheetsConfigured(), false);
+    process.env.GOOGLE_SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/test/exec';
+    assert.equal(pollSheetsConfigured(), true);
+  } finally {
+    if (previousUrl === undefined) delete process.env.GOOGLE_SHEETS_WEBHOOK_URL; else process.env.GOOGLE_SHEETS_WEBHOOK_URL = previousUrl;
+    if (previousSecret === undefined) delete process.env.GOOGLE_SHEETS_WEBHOOK_SECRET; else process.env.GOOGLE_SHEETS_WEBHOOK_SECRET = previousSecret;
   }
 });

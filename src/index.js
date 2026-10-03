@@ -4,7 +4,7 @@ import { handleCommand } from './commands.js';
 import { handlePollInteraction, pollMessage } from './poll-ui.js';
 import { getRepository } from './poll-repository.js';
 import { handleThemeVote, themeMessage } from './theme-vote.js';
-import { flushSheetEvents, sheetsConfigured } from './google-sheet-sync.js';
+import { flushSheetEvents, pollSheetsConfigured, themeSheetsConfigured } from './google-sheet-sync.js';
 import { firebaseConfigured, flushFirebaseEvents } from './firebase-sync.js';
 import { loadJamSchedule } from './jam-schedule-sheet.js';
 import { grantVerifiedMembers, memberVerificationConfigured, runVerificationCampaign } from './member-verification.js';
@@ -24,7 +24,8 @@ client.once(Events.ClientReady, async (readyClient) => {
   }
   await loadDashboardSettings(readyClient, config);
   const repository = getRepository();
-  console.log(sheetsConfigured() ? 'Google Sheets sync enabled.' : 'Google Sheets sync disabled; webhook variables are not set.');
+  console.log(pollSheetsConfigured() ? 'Poll Google Sheets sync enabled.' : 'Poll Google Sheets sync disabled; set GOOGLE_SHEETS_WEBHOOK_URL to a published /exec URL and set GOOGLE_SHEETS_WEBHOOK_SECRET.');
+  console.log(themeSheetsConfigured() ? 'Theme Google Sheets sync enabled.' : 'Theme Google Sheets sync disabled; check THEME_SHEETS_WEBHOOK_URL and THEME_SHEETS_WEBHOOK_SECRET.');
   console.log(firebaseConfigured() ? 'Firebase vote sync enabled.' : 'Firebase vote sync disabled; Firebase variables are not set.');
   console.log(memberVerificationConfigured(config) ? 'Email member verification enabled.' : 'Email member verification disabled; verification variables are not set.');
   await flushSheetEvents(repository);
