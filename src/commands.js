@@ -51,9 +51,9 @@ export async function handleCommand(interaction, config) {
         { name: 'Voting ends', value: jam.votingEnd ? timestamp(jam.votingEnd) : 'To be announced', inline: false },
       ] }] });
     case 'rules':
-      return interaction.reply('Keep the scope tiny, be kind to fellow jammers, credit any third-party assets, disclose AI-generated assets in your submission notes, and submit before the deadline. The jam page is the source of truth: ' + jam.url);
+      return interaction.reply(config.rules + ' The jam page is the source of truth: ' + jam.url);
     case 'resources':
-      return interaction.reply('Free jam-friendly resources:\n• [Kenney](https://kenney.nl/assets) — game assets\n• [OpenGameArt](https://opengameart.org/) — community assets\n• [Freesound](https://freesound.org/) — sound effects\n• [Google Fonts](https://fonts.google.com/) — fonts\nPlease check each asset’s licence and give credit where required.');
+      return interaction.reply(config.resources);
     case 'teamup': {
       const role = interaction.options.getString('role', true);
       const skills = interaction.options.getString('skills', true);

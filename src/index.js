@@ -8,6 +8,7 @@ import { flushSheetEvents, sheetsConfigured } from './google-sheet-sync.js';
 import { firebaseConfigured, flushFirebaseEvents } from './firebase-sync.js';
 import { loadJamSchedule } from './jam-schedule-sheet.js';
 import { grantVerifiedMembers, memberVerificationConfigured, runVerificationCampaign, sendVerificationDm } from './member-verification.js';
+import { loadDashboardSettings, runDashboardBridge } from './dashboard-bridge.js';
 
 let config = getConfig();
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
@@ -21,6 +22,7 @@ client.once(Events.ClientReady, async (readyClient) => {
   } catch (error) {
     console.error('Google Sheet schedule unavailable; using .env dates:', error.message);
   }
+  await loadDashboardSettings(readyClient, config);
   const repository = getRepository();
   console.log(sheetsConfigured() ? 'Google Sheets sync enabled.' : 'Google Sheets sync disabled; webhook variables are not set.');
   console.log(firebaseConfigured() ? 'Firebase vote sync enabled.' : 'Firebase vote sync disabled; Firebase variables are not set.');
@@ -33,6 +35,8 @@ client.once(Events.ClientReady, async (readyClient) => {
   setInterval(() => grantVerifiedMembers(readyClient, config), 15_000).unref();
   await runVerificationCampaign(readyClient, config);
   setInterval(() => runVerificationCampaign(readyClient, config), 15_000).unref();
+  await runDashboardBridge(readyClient, config, repository);
+  setInterval(() => runDashboardBridge(readyClient, config, repository), 10_000).unref();
   for (const poll of repository.list()) {
     if (!poll.messageId) continue;
     try {

@@ -25,10 +25,11 @@ The bot needs no privileged gateway intents.
 
 ## Vercel dashboard and polls
 
-1. Import this repository into Vercel. In **Storage**, connect a Redis/KV integration and copy its `KV_REST_API_URL` and `KV_REST_API_TOKEN` environment variables.
-2. Add every value from `.env.example` to Vercel's environment settings, especially `BOT_API_SECRET` and `DASHBOARD_PASSWORD`; deploy it.
-3. Put the deployment URL (for example `https://bros-jam-bot.vercel.app`) into the bot's `DASHBOARD_URL`, using the exact same `BOT_API_SECRET`, then restart the bot.
-4. Open the deployment URL and sign in with `DASHBOARD_PASSWORD`. The dashboard has a visual poll composer and anonymous aggregate results.
+1. Import this repository into Vercel. Set `DASHBOARD_PASSWORD`, the Firebase variables, the matching `VERIFICATION_LINK_SECRET`, and Gmail SMTP variables from `.env.example`.
+2. Put the production Vercel URL in `DASHBOARD_URL` on both Vercel and Wispbyte, then redeploy Vercel and restart the bot.
+3. Open the deployment URL and sign in. The dashboard shows live bot polls and theme totals, sends announcements, publishes and closes polls, manages the bot activity and command details, and queues verification DMs.
+
+See [BOT-ENV.md](BOT-ENV.md) for the exact Wispbyte and Vercel environment lists. Dashboard actions are delivered through Firestore and normally complete within 10 seconds while the bot is online.
 
 ## Private Discord poll editor
 
@@ -52,6 +53,6 @@ New non-admin members receive a private link to `/verify`, enter an email addres
 
 For Wispbyte deployment, use the ready-made archive and instructions in [WISPBYTE.md](WISPBYTE.md).
 
-The Vercel dashboard's legacy Redis analytics do not currently sync with this local database. The web composer is a planning form; create and publish through Discord. Existing old poll messages should be replaced with new `/poll` messages. No existing database or messages are deleted by this update.
+The dashboard reads live bot snapshots from Firestore. The bot keeps SQLite as its vote source and reports counts to Firestore every 10 seconds. Private written ideas are not shown in the dashboard.
 
 Run `npm test` to check editor payloads, publishing, vote changes, custom answers, closing, expiry, and persistence.

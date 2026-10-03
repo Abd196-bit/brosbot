@@ -1,6 +1,6 @@
 import { createPoll, listPolls } from '../../../lib/poll-store';
 
-function authorised(request) { return request.headers.get('authorization') === `Bearer ${process.env.BOT_API_SECRET}`; }
+function authorised(request) { return Boolean(process.env.BOT_API_SECRET && request.headers.get('authorization') === `Bearer ${process.env.BOT_API_SECRET}`); }
 export async function GET(request) {
   if (!authorised(request)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
   return Response.json(await listPolls());

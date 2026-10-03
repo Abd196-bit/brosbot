@@ -1,0 +1,8 @@
+.statusbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#1c1f35;border:1px solid #343854;border-radius:14px;padding:14px 20px;margin-bottom:20px}
+.statusbar strong{color:#9ef1bb}
+.statusbar span{color:#b8bad0;flex:1}
+.statusbar button{margin:0;width:auto}
+.grid{margin-bottom:18px}
+.secondary{background:#383c59}
+.job{background:#1c1f35;border:1px solid #343854;border-radius:9px;padding:12px 16px}
+.job a{color:#c4b5fd}
